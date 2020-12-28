@@ -97,16 +97,17 @@
 		keysDown = [];
 	});
 
-	export let isLightTheme = localStorage.getItem('isLightTheme') === 'true' ? true : false;
+	export let isLightTheme =
+		localStorage.getItem("isLightTheme") === "true" ? true : false;
 	function handleThemeChange(event) {
 		isLightTheme = event.detail.isLight;
-		localStorage.setItem('isLightTheme', isLightTheme);
+		localStorage.setItem("isLightTheme", isLightTheme);
 	}
 
 	function updateCaret() {
 		let rect = document.getElementById(current).getBoundingClientRect();
-		caret.style.left = rect.left + "px";
-		caret.style.top = rect.top - 49 + "px";
+		caret.style.left = rect.left - 3 + "px";
+		caret.style.top = rect.top + "px";
 	}
 
 	function deleteLetter() {
@@ -157,6 +158,7 @@
 		height: 100%;
 		overflow: auto;
 		transition: 0.3s;
+		font-size: 32px;
 	}
 
 	.dark {
@@ -168,38 +170,37 @@
 	}
 
 	.light {
-		--main-bg-color: #EFF0F1;
+		--main-bg-color: #eff0f1;
 		--contrast-color: #575f66;
-		--comment-color: #A0A6AC;
-		--correct-color: #86B300;
+		--comment-color: #a0a6ac;
+		--correct-color: #86b300;
 		--incorrect-color: #f07171;
-	}
-
-	main div {
-		margin-top: 50px;
-		max-width: 500px;
-		display: block;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	div {
-		text-align: center;
 	}
 
 	.caret {
 		display: inline-block;
 		position: absolute;
-		width: 2px;
-		height: 1.5rem;
+		width: 3px;
+		height: 1em;
 		background-color: var(--contrast-color);
-		animation: flash 0.5s infinite ease-out alternate;
-		transition: all 0.15s ease 0s;
+		animation: flash 0.5s infinite ease-in alternate;
+		transition: all 0.12s ease 0s;
+	}
+
+	main div {
+		display: flex;
+		justify-content: center;
+		align-items: flex-end;
+		height: 50vh;
 	}
 
 	.text-container {
+		text-align: left;
+		width: 50%;
+		max-width: 750px;
+		font-size: 1em;
 		display: inline-block;
-		font-size: 24px;
+		height: auto;
 		font-family: monospace;
 		color: var(--comment-color);
 		-webkit-touch-callout: none;
@@ -213,7 +214,9 @@
 	.wpm {
 		color: var(--contrast-color);
 		margin-top: 50px;
-		font-size: 24px;
+		font-size: 1em;
+		text-align: center;
+		font-family: monospace;
 	}
 
 	@keyframes flash {
@@ -230,13 +233,15 @@
 	<div>
 		<ThemeSlider on:themeChange={handleThemeChange} />
 		<div class="text-container">
-			<div class="caret" id="caret" />
+			{#if !complete}
+				<div class="caret" id="caret" />
+			{/if}
 			{#each lettersState as letterState, id}
 				<Letter {letterState} {id} />
 			{/each}
 		</div>
-		{#if wpm}
-			<div class="wpm">{wpm}</div>
-		{/if}
 	</div>
+	{#if wpm}
+		<p class="wpm">{wpm}</p>
+	{/if}
 </main>

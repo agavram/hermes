@@ -68,7 +68,6 @@
   }
 </style>
 
-<label class="switch">
-  <button checked={isChecked}/>
+<div class="switch">
   <span on:click={handleTheme} class={isChecked ? "slider round right" : "slider round"}/>
-</label>
+</div>
