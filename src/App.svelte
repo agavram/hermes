@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import * as dict from "./dict.json";
 	import Letter from "./Letter.svelte";
+	import ThemeSlider from "./ThemeSlider.svelte";
 
 	let complete = false;
 	let words = getRandom(dict.default, 25);
@@ -14,7 +15,6 @@
 				isCorrect: undefined,
 			};
 		});
-
 
 	let current = 0;
 	let caret;
@@ -51,16 +51,15 @@
 			finish = Date.now();
 
 			let accuracy = 0;
-			lettersState.forEach(letterState => {
-				if (letterState.isCorrect)
-					accuracy++;
-			})
+			lettersState.forEach((letterState) => {
+				if (letterState.isCorrect) accuracy++;
+			});
 
 			wpm =
-				Math.round((accuracy / 5) / ((finish - start) / 1000 / 60)) +
+				Math.round(accuracy / 5 / ((finish - start) / 1000 / 60)) +
 				" wpm";
 
-			accuracy = accuracy / lettersState.length * 100;
+			accuracy = (accuracy / lettersState.length) * 100;
 		} else {
 			updateCaret();
 		}
@@ -98,10 +97,16 @@
 		keysDown = [];
 	});
 
+	export let isLightTheme = localStorage.getItem('isLightTheme') === 'true' ? true : false;
+	function handleThemeChange(event) {
+		isLightTheme = event.detail.isLight;
+		localStorage.setItem('isLightTheme', isLightTheme);
+	}
+
 	function updateCaret() {
 		let rect = document.getElementById(current).getBoundingClientRect();
 		caret.style.left = rect.left + "px";
-		caret.style.top = rect.top + "px";
+		caret.style.top = rect.top - 49 + "px";
 	}
 
 	function deleteLetter() {
@@ -148,6 +153,29 @@
 
 <style>
 	main {
+		background-color: var(--main-bg-color);
+		height: 100%;
+		overflow: auto;
+		transition: 0.3s;
+	}
+
+	.dark {
+		--main-bg-color: #282a36;
+		--contrast-color: #f8f8f2;
+		--comment-color: #6272a4;
+		--correct-color: #50fa7b;
+		--incorrect-color: #ff5555;
+	}
+
+	.light {
+		--main-bg-color: #EFF0F1;
+		--contrast-color: #575f66;
+		--comment-color: #A0A6AC;
+		--correct-color: #86B300;
+		--incorrect-color: #f07171;
+	}
+
+	main div {
 		margin-top: 50px;
 		max-width: 500px;
 		display: block;
@@ -164,7 +192,7 @@
 		position: absolute;
 		width: 2px;
 		height: 1.5rem;
-		background-color: #f8f8f2;
+		background-color: var(--contrast-color);
 		animation: flash 0.5s infinite ease-out alternate;
 		transition: all 0.15s ease 0s;
 	}
@@ -173,11 +201,17 @@
 		display: inline-block;
 		font-size: 24px;
 		font-family: monospace;
-		color: #6272a4;
+		color: var(--comment-color);
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
 	}
 
 	.wpm {
-		color: white;
+		color: var(--contrast-color);
 		margin-top: 50px;
 		font-size: 24px;
 	}
@@ -192,8 +226,9 @@
 	}
 </style>
 
-<main>
+<main class={isLightTheme ? 'light' : 'dark'} id="main">
 	<div>
+		<ThemeSlider on:themeChange={handleThemeChange} />
 		<div class="text-container">
 			<div class="caret" id="caret" />
 			{#each lettersState as letterState, id}

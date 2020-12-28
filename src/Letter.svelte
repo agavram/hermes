@@ -9,11 +9,11 @@
     }
 
     .correct {
-        color: #50fa7b;
+        color: var(--correct-color);
     }
 
     .incorrect {
-        color: #ff5555;
+        color: var(--incorrect-color);
     }
 </style>
 
