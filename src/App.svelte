@@ -26,17 +26,12 @@
 
 	let start;
 	let finish;
+	let keysDown = [];
 	document.onkeypress = function (event) {
 		if (complete) return;
 		if (start === undefined) start = Date.now();
 
 		if (event.key === "Delete") {
-			while (
-				lettersState[current - 1] !== undefined &&
-				lettersState[current - 1].letter !== " "
-			) {
-				deleteLetter();
-			}
 		} else {
 			let currentLetter = lettersState[current].letter;
 			if (currentLetter === event.key) {
@@ -53,7 +48,6 @@
 			finish = Date.now();
 
 			wpm = Math.round(words.length / ((finish - start) / 1000 / 60)) + " wpm";
-			
 		} else {
 			updateCaret();
 		}
@@ -61,13 +55,36 @@
 
 	document.onkeydown = function (event) {
 		if (complete) return;
+		keysDown.push(event.key);
 
-		if (event.key === "Backspace") {
+		if (keysDown.includes("Backspace")) {
 			deleteLetter();
+			if (
+				keysDown.includes("Meta") ||
+				keysDown.includes("Control") ||
+				keysDown.includes("Alt")
+			) {
+				while (
+					lettersState[current - 1] !== undefined &&
+					lettersState[current - 1].letter !== " "
+				) {
+					deleteLetter();
+				}
+			}
 		}
 
 		updateCaret();
 	};
+
+	document.onkeyup = function (event) {
+		removeArray(keysDown, event.key);
+	};
+
+	// Needed if key is pressed down when focus is lost
+	window.addEventListener('focus', function (event) {
+		console.log('focused');
+		keysDown = [];
+	});
 
 	function updateCaret() {
 		let rect = document.getElementById(current).getBoundingClientRect();
