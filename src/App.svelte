@@ -4,7 +4,7 @@
 	import Letter from "./Letter.svelte";
 
 	let complete = false;
-	let words = getRandom(dict.default, 25);
+	let words = getRandom(dict.default, 2);
 
 	export let lettersState = (words.join(" ") + " ")
 		.split("")
@@ -15,7 +15,6 @@
 			};
 		});
 
-	export let wpm;
 
 	let current = 0;
 	let caret;
@@ -23,6 +22,9 @@
 		caret = document.getElementById("caret");
 		updateCaret();
 	});
+
+	export let wpm;
+	export let accuracy;
 
 	let start;
 	let finish;
@@ -43,11 +45,22 @@
 		}
 
 		if (current === lettersState.length) {
+			lettersState.pop();
 			current--;
 			complete = true;
 			finish = Date.now();
 
-			wpm = Math.round(words.length / ((finish - start) / 1000 / 60)) + " wpm";
+			let accuracy = 0;
+			lettersState.forEach(letterState => {
+				if (letterState.isCorrect)
+					accuracy++;
+			})
+
+			wpm =
+				Math.round((accuracy / 5) / ((finish - start) / 1000 / 60)) +
+				" wpm";
+
+			accuracy = accuracy / lettersState.length * 100;
 		} else {
 			updateCaret();
 		}
@@ -81,8 +94,7 @@
 	};
 
 	// Needed if key is pressed down when focus is lost
-	window.addEventListener('focus', function (event) {
-		console.log('focused');
+	window.addEventListener("focus", function (event) {
 		keysDown = [];
 	});
 
