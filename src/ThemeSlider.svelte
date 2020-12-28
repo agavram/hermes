@@ -2,11 +2,14 @@
 	import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
+  export let isChecked = localStorage.getItem('isLightTheme') === 'true';
   
   function handleTheme(event) {
-    event.preventDefault();
+    console.log('clicked');
+
+    isChecked = !isChecked;
     dispatch('themeChange', {
-      isLight: event.srcElement.checked
+      isLight: isChecked
     })
   }
 </script>
@@ -19,12 +22,6 @@
     height: 34px;
     top: 16px;
     right: 16px;
-  }
-
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
   }
 
   .slider {
@@ -51,11 +48,11 @@
     transition: 0.4s;
   }
 
-  /* input + .slider {
+  /* div + .slider {
       box-shadow: 0 0 10px white;
     } */
 
-  input:checked + .slider:before {
+  .right:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
     transform: translateX(26px);
@@ -72,6 +69,6 @@
 </style>
 
 <label class="switch">
-  <input type="checkbox" on:change={handleTheme} checked={localStorage.getItem('isLightTheme') === 'true'}/>
-  <span class="slider round" />
+  <button checked={isChecked}/>
+  <span on:click={handleTheme} class={isChecked ? "slider round right" : "slider round"}/>
 </label>
