@@ -4,7 +4,7 @@
 	import Letter from "./Letter.svelte";
 
 	let complete = false;
-	let words = getRandom(dict.default, 2);
+	let words = getRandom(dict.default, 25);
 
 	export let lettersState = (words.join(" ") + " ")
 		.split("")
