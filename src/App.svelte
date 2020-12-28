@@ -3,6 +3,7 @@
 	import * as dict from "./dict.json";
 	import Letter from "./Letter.svelte";
 	import ThemeSlider from "./ThemeSlider.svelte";
+	import Hermes from "./Hermes.svelte";
 
 	let complete = false;
 	let words = getRandom(dict.default, 25);
@@ -167,6 +168,7 @@
 		--comment-color: #6272a4;
 		--correct-color: #50fa7b;
 		--incorrect-color: #ff5555;
+		--accent-color: #ff79c6;
 	}
 
 	.light {
@@ -175,6 +177,7 @@
 		--comment-color: #a0a6ac;
 		--correct-color: #86b300;
 		--incorrect-color: #f07171;
+		--accent-color: #FF9940;
 	}
 
 	.caret {
@@ -189,9 +192,25 @@
 
 	main div {
 		display: flex;
-		justify-content: center;
-		align-items: flex-end;
+		flex-direction: column;
+		justify-content: flex-end;
+		align-items: center;
 		height: 50vh;
+	}
+	
+	.logo {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.logo h1 {
+		font-family: monospace;
+		font-style: italic;
+		font-size: 64px;
+		color: var(--contrast-color);
+		vertical-align: middle;
 	}
 
 	.text-container {
@@ -231,6 +250,7 @@
 
 <main class={isLightTheme ? 'light' : 'dark'} id="main">
 	<div>
+		<div class="logo"><h1>hermes</h1><Hermes></Hermes></div>
 		<ThemeSlider on:themeChange={handleThemeChange} />
 		<div class="text-container">
 			{#if !complete}
