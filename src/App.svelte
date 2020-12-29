@@ -206,7 +206,7 @@
 		flex-direction: column;
 		justify-content: flex-end;
 		align-items: center;
-		height: 50vh;
+		min-height: 35vh;
 	}
 
 	.logo {
