@@ -3,33 +3,22 @@
 	import * as dict from "./dict.json";
 	import Letter from "./Letter.svelte";
 	import ThemeSlider from "./ThemeSlider.svelte";
-	import Hermes from "./Hermes.svelte";
+	import Hermes from "./assets/Hermes.svelte";
+	import Redo from "./assets/Redo.svelte";
 
-	let complete = false;
-	let words = getRandom(dict.default, 25);
-
-	export let lettersState = (words.join(" ") + " ")
-		.split("")
-		.map(function (letter) {
-			return {
-				letter: letter,
-				isCorrect: undefined,
-			};
-		});
-
-	let current = 0;
-	let caret;
-	onMount(() => {
-		caret = document.getElementById("caret");
-		updateCaret();
-	});
-
+	export let lettersState = [];
 	export let wpm;
 	export let accuracy;
+	export let caretState = undefined;
 
+	let complete = false;
+	let current = 0;
 	let start;
 	let finish;
 	let keysDown = [];
+
+	handleRedo();
+
 	document.onkeypress = function (event) {
 		if (complete) return;
 		if (start === undefined) start = Date.now();
@@ -84,9 +73,8 @@
 					deleteLetter();
 				}
 			}
+			updateCaret();
 		}
-
-		updateCaret();
 	};
 
 	document.onkeyup = function (event) {
@@ -98,6 +86,26 @@
 		keysDown = [];
 	});
 
+	function handleRedo() {
+		complete = false;
+		wpm = undefined;
+		current = 0;
+		start = undefined;
+
+		let words = getRandom(dict.default, 25);
+
+		lettersState = (words.join(" ") + " ").split("").map(function (letter) {
+			return {
+				letter: letter,
+				isCorrect: undefined,
+			};
+		});
+
+		setTimeout(() => {
+			updateCaret();
+		}, 0);
+	}
+
 	export let isLightTheme =
 		localStorage.getItem("isLightTheme") === "true" ? true : false;
 	function handleThemeChange(event) {
@@ -107,8 +115,11 @@
 
 	function updateCaret() {
 		let rect = document.getElementById(current).getBoundingClientRect();
-		caret.style.left = rect.left - 3 + "px";
-		caret.style.top = rect.top + "px";
+
+		caretState = {
+			top: rect.top + "px",
+			left: rect.left - 3 + "px",
+		};
 	}
 
 	function deleteLetter() {
@@ -177,7 +188,7 @@
 		--comment-color: #a0a6ac;
 		--correct-color: #86b300;
 		--incorrect-color: #f07171;
-		--accent-color: #FF9940;
+		--accent-color: #ff9940;
 	}
 
 	.caret {
@@ -197,7 +208,7 @@
 		align-items: center;
 		height: 50vh;
 	}
-	
+
 	.logo {
 		display: flex;
 		flex-direction: row;
@@ -230,12 +241,21 @@
 		user-select: none;
 	}
 
-	.wpm {
+	.results {
 		color: var(--contrast-color);
 		margin-top: 50px;
 		font-size: 1em;
-		text-align: center;
 		font-family: monospace;
+		display: flex;
+		flex-direction: row;
+		height: auto;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.results p {
+		display: inline;
+		padding-right: 24px;
 	}
 
 	@keyframes flash {
@@ -250,18 +270,24 @@
 
 <main class={isLightTheme ? 'light' : 'dark'} id="main">
 	<div>
-		<div class="logo"><h1>hermes</h1><Hermes></Hermes></div>
+		<div class="logo">
+			<h1>hermes</h1>
+			<Hermes />
+		</div>
 		<ThemeSlider on:themeChange={handleThemeChange} />
 		<div class="text-container">
-			{#if !complete}
-				<div class="caret" id="caret" />
+			{#if !complete && caretState !== undefined}
+				<span class="caret" id="caret" style={`top: ${caretState.top}; left: ${caretState.left}`} />
 			{/if}
 			{#each lettersState as letterState, id}
 				<Letter {letterState} {id} />
 			{/each}
 		</div>
 	</div>
-	{#if wpm}
-		<p class="wpm">{wpm}</p>
-	{/if}
+	<div class="results">
+		{#if wpm}
+			<p>{wpm}</p>
+		{/if}
+		<Redo on:redo={handleRedo} />
+	</div>
 </main>
