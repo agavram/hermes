@@ -202,11 +202,11 @@
 	}
 
 	main div {
+		margin-top: 25px;
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-end;
 		align-items: center;
-		min-height: 35vh;
 	}
 
 	.logo {
@@ -249,7 +249,7 @@
 		display: flex;
 		flex-direction: row;
 		height: auto;
-		align-items: center;
+		align-items: flex-start;
 		justify-content: center;
 	}
 
