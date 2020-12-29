@@ -11,7 +11,7 @@
 	export let accuracy;
 	export let caretState = undefined;
 
-	let complete = false;
+	let complete = undefined;
 	let current = 0;
 	let start;
 	let finish;
@@ -45,6 +45,7 @@
 				if (letterState.isCorrect) accuracy++;
 			});
 
+			// Assuming 5 characters per word
 			wpm =
 				Math.round(accuracy / 5 / ((finish - start) / 1000 / 60)) +
 				" wpm";
@@ -88,11 +89,10 @@
 
 	function handleRedo() {
 		complete = false;
-		wpm = undefined;
 		current = 0;
 		start = undefined;
 
-		let words = getRandom(dict.default, 25);
+		let words = getRandom(dict.default, 2);
 
 		lettersState = (words.join(" ") + " ").split("").map(function (letter) {
 			return {
@@ -201,7 +201,7 @@
 		transition: all 0.12s ease 0s;
 	}
 
-	main div {
+	.typing {
 		margin-top: 25px;
 		display: flex;
 		flex-direction: column;
@@ -216,7 +216,7 @@
 		justify-content: center;
 	}
 
-	.logo h1 {
+	.logo > h1 {
 		font-family: monospace;
 		font-style: italic;
 		font-size: 64px;
@@ -242,20 +242,31 @@
 	}
 
 	.results {
-		color: var(--contrast-color);
-		margin-top: 50px;
-		font-size: 1em;
-		font-family: monospace;
+		margin-top: 25px;
+		width: 100%;
 		display: flex;
-		flex-direction: row;
-		height: auto;
-		align-items: center;
 		justify-content: center;
+		color: var(--contrast-color)
 	}
 
-	.results p {
-		display: inline;
-		padding-right: 24px;
+	.results > * {
+		display: inline-block;
+		flex: 1 1 0px;
+		flex-basis: 0;
+		height: auto;
+		margin: 0;
+		padding: 0;
+		transition: 0.2s ease all;
+	}
+
+	.results > div {
+		margin-left: 30px;
+		position: relative;
+		transform: translateX(-48px);
+	}
+
+	.results > p {
+		text-align: right;
 	}
 
 	@keyframes flash {
@@ -269,7 +280,7 @@
 </style>
 
 <main class={isLightTheme ? 'light' : 'dark'} id="main">
-	<div>
+	<div class="typing">
 		<div class="logo">
 			<h1>hermes</h1>
 			<Hermes />
@@ -277,7 +288,10 @@
 		<ThemeSlider on:themeChange={handleThemeChange} />
 		<div class="text-container">
 			{#if !complete && caretState !== undefined}
-				<span class="caret" id="caret" style={`top: ${caretState.top}; left: ${caretState.left}`} />
+				<span
+					class="caret"
+					id="caret"
+					style={`top: ${caretState.top}; left: ${caretState.left}`} />
 			{/if}
 			{#each lettersState as letterState, id}
 				<Letter {letterState} {id} />
@@ -285,9 +299,11 @@
 		</div>
 	</div>
 	<div class="results">
-		{#if wpm}
-			<p>{wpm}</p>
-		{/if}
-		<Redo on:redo={handleRedo} />
+		<p style={complete ? "opacity: 1;" : "opacity: 0;"}>
+		 	{wpm}
+		</p>
+		<div style={complete ? "transform: translateX(0);" : ""}>
+			<Redo on:redo={handleRedo} />
+		</div>
 	</div>
 </main>
