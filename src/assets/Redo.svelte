@@ -1,19 +1,18 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
-	const dispatch = createEventDispatcher();
+    import { createEventDispatcher } from "svelte";
+    const dispatch = createEventDispatcher();
 
     export let animate = false;
 
     function handleClick(e) {
-        animate = true;
-        dispatch('redo');
+        if (!animate) {
+            animate = true;
+            setTimeout(() => {
+                animate = false;
+            }, 1000);
+        }
+        dispatch("redo");
     }
-
-    // Mouse down happens first and removes the class
-    function handleMouseDown(e) {
-        animate = false;
-    }
-
 
 </script>
 
@@ -44,8 +43,7 @@
 
 <svg
     on:click={handleClick}
-    on:mousedown={handleMouseDown}
-    class:animate={animate}
+    class:animate
     id="redo"
     width="36"
     height="36"

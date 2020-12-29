@@ -5,8 +5,6 @@
   export let isChecked = localStorage.getItem('isLightTheme') === 'true';
   
   function handleTheme(event) {
-    console.log('clicked');
-
     isChecked = !isChecked;
     dispatch('themeChange', {
       isLight: isChecked
@@ -17,7 +15,6 @@
 <style>
   .switch {
     position: absolute;
-    display: inline-block;
     width: 60px;
     height: 34px;
     top: 16px;

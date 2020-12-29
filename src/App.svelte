@@ -2,28 +2,37 @@
 	import * as dict from "./dict.json";
 	import Letter from "./Letter.svelte";
 	import ThemeSlider from "./ThemeSlider.svelte";
+	import WPM from "./WPM.svelte";
 	import Hermes from "./assets/Hermes.svelte";
 	import Redo from "./assets/Redo.svelte";
+	import { onMount } from "svelte";
 
 	export let lettersState = [];
 	export let wpm;
-	export let accuracy;
 	export let caretState = undefined;
+	export let fade = false;
+	export let typingSpeeds = [10, 25, 50];
 
 	let complete = undefined;
 	let current = 0;
 	let start;
 	let finish;
 	let keysDown = [];
+	let speed = localStorage.getItem("speed")
+		? localStorage.getItem("speed")
+		: 25;
 
-	handleRedo();
+	onMount(() => {
+		handleRedo();
+
+		updateSpeedIndicator();
+	});
 
 	document.onkeypress = function (event) {
-		if (complete) return;
+		if (complete || lettersState.length === 0) return;
 		if (start === undefined) start = Date.now();
 
-		if (event.key === "Delete") {
-		} else {
+		if (event.key !== "Delete") {
 			let currentLetter = lettersState[current].letter;
 			if (currentLetter === event.key) {
 				lettersState[current].isCorrect = true;
@@ -33,27 +42,30 @@
 			current++;
 		}
 
-		if (current === lettersState.length) {
+		updateWPM();
+		if (current !== lettersState.length) {
+			updateCaret();
+		} else {
+			complete = true;
 			lettersState.pop();
 			current--;
-			complete = true;
-			finish = Date.now();
-
-			let accuracy = 0;
-			lettersState.forEach((letterState) => {
-				if (letterState.isCorrect) accuracy++;
-			});
-
-			// Assuming 5 characters per word
-			wpm =
-				Math.round(accuracy / 5 / ((finish - start) / 1000 / 60)) +
-				" wpm";
-
-			accuracy = (accuracy / lettersState.length) * 100;
-		} else {
-			updateCaret();
 		}
 	};
+
+	function updateWPM() {
+		if (current <= 1) return;
+
+		finish = Date.now();
+
+		let correct = 0;
+		for (let i = 0; i < current; i++) {
+			const letterState = lettersState[i];
+			if (letterState.isCorrect) correct++;
+		}
+
+		// Assuming 5 characters per word
+		wpm = Math.round(correct / 5 / ((finish - start) / 1000 / 60));
+	}
 
 	document.onkeydown = function (event) {
 		if (complete) return;
@@ -79,6 +91,10 @@
 
 	document.onkeyup = function (event) {
 		removeArray(keysDown, event.key);
+
+		if (event.code === "Escape") {
+            handleRedo();
+        }
 	};
 
 	// Needed if key is pressed down when focus is lost
@@ -87,22 +103,30 @@
 	});
 
 	function handleRedo() {
-		complete = false;
+		fade = true;
 		current = 0;
 		start = undefined;
-
-		let words = getRandom(dict.default, 15);
-
-		lettersState = (words.join(" ") + " ").split("").map(function (letter) {
-			return {
-				letter: letter,
-				isCorrect: undefined,
-			};
-		});
+		wpm = undefined;
 
 		setTimeout(() => {
-			updateCaret();
-		}, 0);
+			let words = getRandom(dict.default, speed);
+
+			lettersState = (words.join(" ") + " ")
+				.split("")
+				.map(function (letter) {
+					return {
+						letter: letter,
+						isCorrect: undefined,
+					};
+				});
+
+			setTimeout(() => {
+				updateCaret();
+				updateSpeedIndicator();
+				complete = false;
+			}, 0);
+			fade = false;
+		}, 300);
 	}
 
 	export let isLightTheme =
@@ -110,6 +134,30 @@
 	function handleThemeChange(event) {
 		isLightTheme = event.detail.isLight;
 		localStorage.setItem("isLightTheme", isLightTheme);
+	}
+
+	function handleSpeedSelected(e) {
+		updateSpeedIndicator(e);
+
+		const newSpeed = parseInt(e.srcElement.innerHTML);
+		if (newSpeed !== speed) {
+			speed = newSpeed;
+			localStorage.setItem("speed", speed);
+			handleRedo();
+		}
+	}
+
+	function updateSpeedIndicator(e) {
+		if (!e) {
+			let src = document.getElementById("speed" + speed);
+			if (!src) {
+				src = document.getElementsByClassName("speed")[0];
+			}
+			e = { srcElement: src };
+		}
+		const hr = document.getElementById("hr");
+		hr.style.left = e.srcElement.getBoundingClientRect().left + "px";
+		hr.style.top = e.srcElement.getBoundingClientRect().bottom + "px";
 	}
 
 	function updateCaret() {
@@ -160,6 +208,7 @@
 
 	window.onresize = function (event) {
 		updateCaret();
+		updateSpeedIndicator();
 	};
 </script>
 
@@ -167,7 +216,6 @@
 	main {
 		background-color: var(--main-bg-color);
 		height: 100%;
-		overflow: auto;
 		transition: 0.3s;
 		font-size: 32px;
 	}
@@ -201,10 +249,10 @@
 	}
 
 	.typing {
-		margin-top: 25px;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
-		justify-content: flex-end;
+		justify-content: space-between;
 		align-items: center;
 	}
 
@@ -238,6 +286,7 @@
 		-moz-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
+		transition: 0.2s ease all;
 	}
 
 	.results {
@@ -245,27 +294,29 @@
 		width: 100%;
 		display: flex;
 		justify-content: center;
-		color: var(--contrast-color)
+		color: var(--contrast-color);
+		text-align: center;
 	}
 
 	.results > * {
-		display: inline-block;
+		display: flex;
 		flex: 1 1 0px;
 		flex-basis: 0;
 		height: auto;
 		margin: 0;
 		padding: 0;
 		transition: 0.2s ease all;
+		font-family: monospace;
+		justify-content: center;
+		align-items: center;
 	}
 
-	.results > div {
-		margin-left: 30px;
-		position: relative;
-		transform: translateX(-48px);
+	.typing-speed span {
+		margin: 0 10px 0 10px;
 	}
 
-	.results > p {
-		text-align: right;
+	.typing-speed h4 {
+		cursor: pointer;
 	}
 
 	@keyframes flash {
@@ -276,33 +327,59 @@
 			opacity: 0%;
 		}
 	}
+
+	.fade {
+		opacity: 0;
+	}
+
+	#hr {
+		position: absolute;
+		height: 0.25rem;
+		width: 36px;
+		margin: 0;
+		background: var(--contrast-color);
+		border: none;
+		transition: 0.3s ease-in-out;
+	}
 </style>
 
 <main class={isLightTheme ? 'light' : 'dark'} id="main">
+	<ThemeSlider on:themeChange={handleThemeChange} />
+	{#if !complete && caretState !== undefined}
+		<span
+			class="caret"
+			id="caret"
+			style={`top: ${caretState.top}; left: ${caretState.left}`} />
+	{/if}
 	<div class="typing">
 		<div class="logo">
 			<h1>hermes</h1>
 			<Hermes />
 		</div>
-		<ThemeSlider on:themeChange={handleThemeChange} />
-		<div class="text-container">
-			{#if !complete && caretState !== undefined}
-				<span
-					class="caret"
-					id="caret"
-					style={`top: ${caretState.top}; left: ${caretState.left}`} />
-			{/if}
+		<div class="text-container" class:fade>
 			{#each lettersState as letterState, id}
 				<Letter {letterState} {id} />
 			{/each}
 		</div>
-	</div>
-	<div class="results">
-		<p style={complete ? "opacity: 1;" : "opacity: 0;"}>
-		 	{wpm}
-		</p>
-		<div style={complete ? "transform: translateX(0);" : ""}>
-			<Redo on:redo={handleRedo} />
+		<div class="results">
+			<div>
+				<WPM {wpm} />
+			</div>
+			<div class="redo">
+				<Redo on:redo={handleRedo} />
+			</div>
+			<div class="typing-speed">
+				{#each typingSpeeds as typingSpeed, index}
+					{#if index !== 0}<span>/</span>{/if}
+					<h4
+						class="speed"
+						on:click={handleSpeedSelected}
+						id={'speed' + typingSpeed}>
+						{typingSpeed}
+					</h4>
+				{/each}
+				<hr id="hr" />
+			</div>
 		</div>
 	</div>
 </main>
