@@ -1,5 +1,4 @@
 <script>
-	import { onMount } from "svelte";
 	import * as dict from "./dict.json";
 	import Letter from "./Letter.svelte";
 	import ThemeSlider from "./ThemeSlider.svelte";
@@ -92,7 +91,7 @@
 		current = 0;
 		start = undefined;
 
-		let words = getRandom(dict.default, 2);
+		let words = getRandom(dict.default, 15);
 
 		lettersState = (words.join(" ") + " ").split("").map(function (letter) {
 			return {
