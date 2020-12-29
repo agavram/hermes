@@ -28,13 +28,13 @@
 		updateSpeedIndicator();
 	});
 
-	document.onkeypress = function (event) {
+	document.onkeypress = function (e) {
 		if (complete || lettersState.length === 0) return;
 		if (start === undefined) start = Date.now();
 
-		if (event.key !== "Delete") {
+		if (e.key !== "Delete") {
 			let currentLetter = lettersState[current].letter;
-			if (currentLetter === event.key) {
+			if (currentLetter === e.key) {
 				lettersState[current].isCorrect = true;
 			} else {
 				lettersState[current].isCorrect = false;
@@ -67,11 +67,13 @@
 		wpm = Math.round(correct / 5 / ((finish - start) / 1000 / 60));
 	}
 
-	document.onkeydown = function (event) {
+	document.onkeydown = function (e) {
 		if (complete) return;
-		keysDown.push(event.key);
+		keysDown.push(e.key);
 
 		if (keysDown.includes("Backspace")) {
+			// Stops from going back in firefox
+			e.preventDefault();
 			deleteLetter();
 			if (
 				keysDown.includes("Meta") ||
