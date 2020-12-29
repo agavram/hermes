@@ -249,7 +249,7 @@
 		display: flex;
 		flex-direction: row;
 		height: auto;
-		align-items: flex-start;
+		align-items: center;
 		justify-content: center;
 	}
 
