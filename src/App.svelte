@@ -10,6 +10,7 @@
 	export let lettersState = [];
 	export let wpm;
 	export let caretState = undefined;
+	export let speedIndicatorState = undefined;
 	export let fade = false;
 	export let typingSpeeds = [10, 25, 50];
 
@@ -19,13 +20,12 @@
 	let finish;
 	let keysDown = [];
 	let speed = localStorage.getItem("speed")
-		? localStorage.getItem("speed")
+		? parseInt(localStorage.getItem("speed"))
 		: 25;
 
 	onMount(() => {
 		handleRedo();
-
-		updateSpeedIndicator();
+		updateSpeedIndicator(speed);
 	});
 
 	document.onkeypress = function (e) {
@@ -140,10 +140,9 @@
 		localStorage.setItem("isLightTheme", isLightTheme);
 	}
 
-	function handleSpeedSelected(e) {
-		updateSpeedIndicator(e);
+	function handleSpeedSelected(newSpeed) {
+		updateSpeedIndicator();
 
-		const newSpeed = parseInt(e.srcElement.innerHTML);
 		if (newSpeed !== speed) {
 			speed = newSpeed;
 			localStorage.setItem("speed", speed);
@@ -151,17 +150,16 @@
 		}
 	}
 
-	function updateSpeedIndicator(e) {
-		if (!e) {
+	function updateSpeedIndicator() {
 			let src = document.getElementById("speed" + speed);
 			if (!src) {
 				src = document.getElementsByClassName("speed")[0];
 			}
-			e = { srcElement: src };
+
+		speedIndicatorState = {
+			top: src.getBoundingClientRect().bottom + "px",
+			left: src.getBoundingClientRect().left + "px"
 		}
-		const hr = document.getElementById("hr");
-		hr.style.left = e.srcElement.getBoundingClientRect().left + "px";
-		hr.style.top = e.srcElement.getBoundingClientRect().bottom + "px";
 	}
 
 	function updateCaret() {
@@ -336,7 +334,7 @@
 		opacity: 0;
 	}
 
-	#hr {
+	hr {
 		position: absolute;
 		height: 0.25rem;
 		width: 36px;
@@ -352,7 +350,6 @@
 	{#if !complete && caretState !== undefined}
 		<span
 			class="caret"
-			id="caret"
 			style={`top: ${caretState.top}; left: ${caretState.left}`} />
 	{/if}
 	<div class="typing">
@@ -377,12 +374,14 @@
 					{#if index !== 0}<span>/</span>{/if}
 					<h4
 						class="speed"
-						on:click={handleSpeedSelected}
-						id={'speed' + typingSpeed}>
+						id={'speed' + typingSpeed}
+						on:click={() => handleSpeedSelected(typingSpeed)}>
 						{typingSpeed}
 					</h4>
 				{/each}
-				<hr id="hr" />
+				{#if speedIndicatorState !== undefined}
+					<hr style={`top: ${speedIndicatorState.top}; left: ${speedIndicatorState.left}`}/>
+				{/if}
 			</div>
 		</div>
 	</div>
