@@ -13,8 +13,8 @@
 	export let fade = false;
 	export let typingSpeeds = [10, 25, 50];
 
-	let complete = undefined;
 	let current = 0;
+	let complete;
 	let start;
 	let finish;
 	let keysDown = [];
@@ -53,7 +53,7 @@
 	};
 
 	function updateWPM() {
-		if (current <= 1) return;
+		if (current <= 1 && start !== undefined) return;
 
 		finish = Date.now();
 
@@ -72,9 +72,11 @@
 		keysDown.push(e.key);
 
 		if (keysDown.includes("Backspace")) {
-			// Stops from going back in firefox
-			e.preventDefault();
-			deleteLetter();
+			if (e.key === "Backspace") {
+				// Stops from going back in firefox
+				e.preventDefault();
+				deleteLetter();
+			}
 			if (
 				keysDown.includes("Meta") ||
 				keysDown.includes("Control") ||
@@ -95,8 +97,8 @@
 		removeArray(keysDown, event.key);
 
 		if (event.code === "Escape") {
-            handleRedo();
-        }
+			handleRedo();
+		}
 	};
 
 	// Needed if key is pressed down when focus is lost

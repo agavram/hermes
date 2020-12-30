@@ -1,4 +1,4 @@
 <script>
     export let wpm
 </script>
-<h4>{wpm ? wpm : "--"} wpm</h4>
+<h4>{wpm !== undefined ? wpm : "--"} wpm</h4>
