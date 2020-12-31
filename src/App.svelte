@@ -274,6 +274,7 @@
 		background-color: var(--main-bg-color);
 		height: 100%;
 		transition: 0.3s;
+		transition-property: background-color, color;
 		font-size: 28px;
 	}
 
@@ -306,7 +307,8 @@
 		height: 1em;
 		background-color: var(--contrast-color);
 		animation: flash 0.5s infinite ease-in alternate;
-		transition: all 0.12s ease 0s;
+		transition: 0.12s ease;
+		transition-property: left, top;
 	}
 
 	.typing {
@@ -347,7 +349,8 @@
 		-moz-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
-		transition: 0.2s ease all;
+		transition: 0.2s ease;
+		transition-property: opacity;
 	}
 
 	.bottom {
@@ -367,7 +370,6 @@
 		height: auto;
 		margin: 0;
 		padding: 0;
-		transition: 0.2s ease all;
 		font-family: monospace;
 		justify-content: center;
 		align-items: center;
@@ -418,7 +420,8 @@
 		margin: 0;
 		background: var(--contrast-color);
 		border: none;
-		transition: 0.3s ease-in-out;
+		transition: 0.2s ease-in-out;
+		transition-property: width, top, left;
 	}
 </style>
 

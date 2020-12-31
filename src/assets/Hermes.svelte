@@ -1,6 +1,7 @@
 <style>
     path {
         transition: 0.3s;
+        transition-property: fill;
         fill: var(--accent-color);
     }
     svg {

@@ -5,7 +5,8 @@
 
 <style>
     letter {
-        transition: 0.2s;
+        transition: 0.3s;
+        transition-property: color;
     }
 
     .correct {
