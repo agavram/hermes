@@ -278,10 +278,6 @@
 		font-size: 28px;
 	}
 
-	h1 {
-		margin: 64px 0 0 0;
-	}
-
 	.dark {
 		--main-bg-color: #282a36;
 		--contrast-color: #f8f8f2;
@@ -320,9 +316,10 @@
 	}
 
 	.logo {
+		margin-top: 64px;
 		display: flex;
 		flex-direction: row;
-		align-items: flex-end;
+		align-items: center;
 		justify-content: center;
 	}
 
@@ -332,6 +329,7 @@
 		font-size: 64px;
 		color: var(--contrast-color);
 		vertical-align: middle;
+		margin: 0;
 	}
 
 	.text-container {

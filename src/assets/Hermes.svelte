@@ -5,14 +5,11 @@
         fill: var(--accent-color);
     }
     svg {
-        width: 100px;
-        height: 100px;
+        height: 50px;
     }
 </style>
 
 <svg
-    width="62"
-    height="31"
     viewBox="0 0 62 31"
     fill="none"
     xmlns="http://www.w3.org/2000/svg">
