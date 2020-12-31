@@ -277,6 +277,10 @@
 		font-size: 28px;
 	}
 
+	h1 {
+		margin: 64px 0 0 0;
+	}
+
 	.dark {
 		--main-bg-color: #282a36;
 		--contrast-color: #f8f8f2;
@@ -316,7 +320,7 @@
 	.logo {
 		display: flex;
 		flex-direction: row;
-		align-items: center;
+		align-items: flex-end;
 		justify-content: center;
 	}
 
