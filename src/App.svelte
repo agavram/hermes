@@ -24,8 +24,10 @@
 		: 25;
 
 	onMount(() => {
-		handleRedo();
-		updateSpeedIndicator(speed);
+		setTimeout(() => {
+			handleRedo();
+			updateSpeedIndicator(speed);
+		}, 0);
 	});
 
 	document.onkeypress = function (e) {
@@ -151,15 +153,15 @@
 	}
 
 	function updateSpeedIndicator() {
-			let src = document.getElementById("speed" + speed);
-			if (!src) {
-				src = document.getElementsByClassName("speed")[0];
-			}
+		let src = document.getElementById("speed" + speed);
+		if (!src) {
+			src = document.getElementsByClassName("speed")[0];
+		}
 
 		speedIndicatorState = {
 			top: src.getBoundingClientRect().bottom + "px",
-			left: src.getBoundingClientRect().left + "px"
-		}
+			left: src.getBoundingClientRect().left + "px",
+		};
 	}
 
 	function updateCaret() {
@@ -380,7 +382,8 @@
 					</h4>
 				{/each}
 				{#if speedIndicatorState !== undefined}
-					<hr style={`top: ${speedIndicatorState.top}; left: ${speedIndicatorState.left}`}/>
+					<hr
+						style={`top: ${speedIndicatorState.top}; left: ${speedIndicatorState.left}`} />
 				{/if}
 			</div>
 		</div>
