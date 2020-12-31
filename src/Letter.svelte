@@ -5,7 +5,7 @@
 
 <style>
     letter {
-        transition: 0.3s;
+        transition: 0.12s;
         transition-property: color;
     }
 

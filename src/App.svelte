@@ -36,7 +36,7 @@
 	let keysDown = [];
 	let length = localStorage.getItem("length")
 		? JSON.parse(localStorage.getItem("length"))
-		: lengths[0];
+		: lengths[1];
 	let dataSource =
 		localStorage.getItem("dataSource") === "quotes" ? "quotes" : "words";
 
@@ -146,7 +146,7 @@
 				let quote;
 				do {
 					quote = getRandom(quotes.default, 1)[0];
-				} while (Math.abs((quote.length / 5) - length.minLength) > 10);
+				} while (Math.abs(quote.length / 5 - length.minLength) > 10);
 				lettersState = (quote.content + " ")
 					.split("")
 					.map(function (letter) {
@@ -163,8 +163,13 @@
 				handleDataSource();
 				complete = false;
 			}, 0);
-			fade = false;
-		}, 300);
+			
+			// ms for color of letters to change
+			setTimeout(() => {
+				fade = false;
+			}, 120);
+			// ms for fade out
+		}, 150);
 	}
 
 	export let isLightTheme =
@@ -276,6 +281,7 @@
 		transition: 0.3s;
 		transition-property: background-color, color;
 		font-size: 28px;
+		font-family: "Roboto Mono", monospace;
 	}
 
 	.dark {
@@ -300,7 +306,7 @@
 		display: inline-block;
 		position: absolute;
 		width: 3px;
-		height: 1em;
+		height: 1.25em;
 		background-color: var(--contrast-color);
 		animation: flash 0.5s infinite ease-in alternate;
 		transition: 0.12s ease;
@@ -324,7 +330,6 @@
 	}
 
 	.logo > h1 {
-		font-family: monospace;
 		font-style: italic;
 		font-size: 64px;
 		color: var(--contrast-color);
@@ -339,7 +344,6 @@
 		font-size: 1em;
 		display: inline-block;
 		height: auto;
-		font-family: monospace;
 		color: var(--comment-color);
 		-webkit-touch-callout: none;
 		-webkit-user-select: none;
@@ -347,8 +351,9 @@
 		-moz-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
-		transition: 0.2s ease;
+		transition: 0.15s ease;
 		transition-property: opacity;
+		line-height: 1.5em;
 	}
 
 	.bottom {
@@ -368,7 +373,6 @@
 		height: auto;
 		margin: 0;
 		padding: 0;
-		font-family: monospace;
 		justify-content: center;
 		align-items: center;
 	}
@@ -423,19 +427,26 @@
 	}
 </style>
 
+<svelte:head>
+	<link rel="preconnect" href="https://fonts.gstatic.com" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital@0;1&display=swap"
+		rel="stylesheet" />
+</svelte:head>
+
 <main class={isLightTheme ? 'light' : 'dark'} id="main">
 	<ThemeSlider on:themeChange={handleThemeChange} />
-	{#if !complete && caretState !== undefined}
-		<span
-			class="caret"
-			style={`top: ${caretState.top}; left: ${caretState.left}`} />
-	{/if}
 	<div class="typing">
 		<div class="logo">
 			<h1>hermes</h1>
 			<Hermes />
 		</div>
 		<div class="text-container" class:fade>
+			{#if !complete && caretState !== undefined}
+				<span
+					class="caret"
+					style={`top: ${caretState.top}; left: ${caretState.left}`} />
+			{/if}
 			{#each lettersState as letterState, id}
 				<Letter {letterState} {id} />
 			{/each}
