@@ -1,3 +1,8 @@
+<style>
+    h4 {
+        white-space: nowrap;
+    }
+</style>
 <script>
     export let wpm
 </script>

@@ -1,5 +1,6 @@
 <script>
-	import * as dict from "./dict.json";
+	import * as words from "./data/words.json";
+	import * as quotes from "./data/quotes.json";
 	import Letter from "./Letter.svelte";
 	import ThemeSlider from "./ThemeSlider.svelte";
 	import WPM from "./WPM.svelte";
@@ -10,23 +11,38 @@
 	export let lettersState = [];
 	export let wpm;
 	export let caretState = undefined;
-	export let speedIndicatorState = undefined;
+	export let lengthIndicatorState = undefined;
+	export let dataSourceIndicatorState = undefined;
 	export let fade = false;
-	export let typingSpeeds = [10, 25, 50];
+	export let lengths = [
+		{
+			minLength: 10,
+			desc: "short",
+		},
+		{
+			minLength: 25,
+			desc: "medium",
+		},
+		{
+			minLength: 50,
+			desc: "long",
+		},
+	];
 
 	let current = 0;
 	let complete;
 	let start;
 	let finish;
 	let keysDown = [];
-	let speed = localStorage.getItem("speed")
-		? parseInt(localStorage.getItem("speed"))
-		: 25;
+	let length = localStorage.getItem("length")
+		? JSON.parse(localStorage.getItem("length"))
+		: lengths[0];
+	let dataSource =
+		localStorage.getItem("dataSource") === "quotes" ? "quotes" : "words";
 
 	onMount(() => {
 		setTimeout(() => {
 			handleRedo();
-			updateSpeedIndicator(speed);
 		}, 0);
 	});
 
@@ -115,20 +131,36 @@
 		wpm = undefined;
 
 		setTimeout(() => {
-			let words = getRandom(dict.default, speed);
-
-			lettersState = (words.join(" ") + " ")
-				.split("")
-				.map(function (letter) {
-					return {
-						letter: letter,
-						isCorrect: undefined,
-					};
-				});
+			if (dataSource === "words") {
+				lettersState = (
+					getRandom(words.default, length.minLength).join(" ") + " "
+				)
+					.split("")
+					.map(function (letter) {
+						return {
+							letter: letter,
+							isCorrect: undefined,
+						};
+					});
+			} else if (dataSource === "quotes") {
+				let quote;
+				do {
+					quote = getRandom(quotes.default, 1)[0];
+				} while (Math.abs((quote.length / 5) - length.minLength) > 10);
+				lettersState = (quote.content + " ")
+					.split("")
+					.map(function (letter) {
+						return {
+							letter: letter,
+							isCorrect: undefined,
+						};
+					});
+			}
 
 			setTimeout(() => {
 				updateCaret();
-				updateSpeedIndicator();
+				updateLengthIndicator();
+				handleDataSource();
 				complete = false;
 			}, 0);
 			fade = false;
@@ -142,25 +174,45 @@
 		localStorage.setItem("isLightTheme", isLightTheme);
 	}
 
-	function handleSpeedSelected(newSpeed) {
-		updateSpeedIndicator();
-
-		if (newSpeed !== speed) {
-			speed = newSpeed;
-			localStorage.setItem("speed", speed);
-			handleRedo();
-		}
+	function handleLengthSelected(newLength) {
+		length = newLength;
+		handleRedo();
+		localStorage.setItem("length", JSON.stringify(length));
 	}
 
-	function updateSpeedIndicator() {
-		let src = document.getElementById("speed" + speed);
+	function updateLengthIndicator() {
+		let src = document.getElementById("length" + length.minLength);
 		if (!src) {
-			src = document.getElementsByClassName("speed")[0];
+			src = document.getElementsByClassName("length")[0];
 		}
 
-		speedIndicatorState = {
+		lengthIndicatorState = {
 			top: src.getBoundingClientRect().bottom + "px",
 			left: src.getBoundingClientRect().left + "px",
+			width:
+				src.getBoundingClientRect().right -
+				src.getBoundingClientRect().left +
+				"px",
+		};
+	}
+
+	function handleDataSource(newDataSource) {
+		if (newDataSource === undefined) {
+			newDataSource = dataSource;
+		} else {
+			localStorage.setItem("dataSource", newDataSource);
+			dataSource = newDataSource;
+			handleRedo();
+		}
+		let src = document.getElementById(newDataSource);
+
+		dataSourceIndicatorState = {
+			top: src.getBoundingClientRect().bottom + "px",
+			left: src.getBoundingClientRect().left + "px",
+			width:
+				src.getBoundingClientRect().right -
+				src.getBoundingClientRect().left +
+				"px",
 		};
 	}
 
@@ -212,7 +264,8 @@
 
 	window.onresize = function (event) {
 		updateCaret();
-		updateSpeedIndicator();
+		updateLengthIndicator();
+		handleDataSource();
 	};
 </script>
 
@@ -221,7 +274,7 @@
 		background-color: var(--main-bg-color);
 		height: 100%;
 		transition: 0.3s;
-		font-size: 32px;
+		font-size: 28px;
 	}
 
 	.dark {
@@ -277,7 +330,7 @@
 
 	.text-container {
 		text-align: left;
-		width: 50%;
+		width: 65%;
 		max-width: 750px;
 		font-size: 1em;
 		display: inline-block;
@@ -293,16 +346,17 @@
 		transition: 0.2s ease all;
 	}
 
-	.results {
+	.bottom {
 		margin-top: 25px;
 		width: 100%;
 		display: flex;
 		justify-content: center;
 		color: var(--contrast-color);
 		text-align: center;
+		flex-wrap: wrap;
 	}
 
-	.results > * {
+	.bottom > * {
 		display: flex;
 		flex: 1 1 0px;
 		flex-basis: 0;
@@ -315,11 +369,28 @@
 		align-items: center;
 	}
 
-	.typing-speed span {
+	.settings {
+		display: flex;
+		flex-wrap: wrap;
+		padding: 0 16px 0 16px;
+	}
+
+	.settings > div {
+		display: flex;
+		align-items: center;
+		margin: 0 16px 16px 16px;
+	}
+
+	.settings > div:not(:first-child) {
+		margin-left: 36px;
+	}
+
+	.settings span {
 		margin: 0 10px 0 10px;
 	}
 
-	.typing-speed h4 {
+	.settings h4 {
+		margin: 0;
 		cursor: pointer;
 	}
 
@@ -364,26 +435,43 @@
 				<Letter {letterState} {id} />
 			{/each}
 		</div>
-		<div class="results">
+		<div class="bottom">
 			<div>
 				<WPM {wpm} />
 			</div>
 			<div class="redo">
 				<Redo on:redo={handleRedo} />
 			</div>
-			<div class="typing-speed">
-				{#each typingSpeeds as typingSpeed, index}
-					{#if index !== 0}<span>/</span>{/if}
-					<h4
-						class="speed"
-						id={'speed' + typingSpeed}
-						on:click={() => handleSpeedSelected(typingSpeed)}>
-						{typingSpeed}
+			<div class="settings">
+				<div class="lengths">
+					{#each lengths as length, index}
+						{#if index !== 0}<span>/</span>{/if}
+						<h4
+							class="length"
+							id={'length' + length.minLength}
+							on:click={() => handleLengthSelected(length)}>
+							{length.desc}
+						</h4>
+					{/each}
+				</div>
+
+				<div>
+					<h4 id="words" on:click={() => handleDataSource('words')}>
+						words
 					</h4>
-				{/each}
-				{#if speedIndicatorState !== undefined}
+					<span> /</span>
+					<h4 id="quotes" on:click={() => handleDataSource('quotes')}>
+						quotes
+					</h4>
+				</div>
+
+				{#if lengthIndicatorState !== undefined}
 					<hr
-						style={`top: ${speedIndicatorState.top}; left: ${speedIndicatorState.left}`} />
+						style={`top: ${lengthIndicatorState.top}; left: ${lengthIndicatorState.left}; width: ${lengthIndicatorState.width}`} />
+				{/if}
+				{#if dataSourceIndicatorState !== undefined}
+					<hr
+						style={`top: ${dataSourceIndicatorState.top}; left: ${dataSourceIndicatorState.left}; width: ${dataSourceIndicatorState.width}`} />
 				{/if}
 			</div>
 		</div>
