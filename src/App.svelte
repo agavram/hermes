@@ -285,6 +285,14 @@
 </script>
 
 <style>
+	@keyframes flash {
+		0% {
+			opacity: 100%;
+		}
+		to {
+			opacity: 0%;
+		}
+	}
 	main {
 		background-color: var(--main-bg-color);
 		height: 100%;
@@ -293,7 +301,6 @@
 		font-size: 28px;
 		font-family: "Roboto Mono", monospace;
 	}
-
 	.dark {
 		--main-bg-color: #282a36;
 		--contrast-color: #f8f8f2;
@@ -302,7 +309,6 @@
 		--incorrect-color: #ff5555;
 		--accent-color: #ff79c6;
 	}
-
 	.light {
 		--main-bg-color: #eff0f1;
 		--contrast-color: #575f66;
@@ -311,7 +317,6 @@
 		--incorrect-color: #f07171;
 		--accent-color: #ff9940;
 	}
-
 	.caret {
 		display: inline-block;
 		position: absolute;
@@ -322,31 +327,27 @@
 		transition: 0.12s ease;
 		transition-property: left, top;
 	}
-
+	.logo,
+	.typing {
+		display: flex;
+		align-items: center;
+	}
 	.typing {
 		height: 100%;
-		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		align-items: center;
 	}
-
 	.logo {
 		margin-top: 64px;
-		display: flex;
 		flex-direction: row;
-		align-items: center;
 		justify-content: center;
 	}
-
 	.logo > h1 {
 		font-style: italic;
 		font-size: 64px;
-		color: var(--contrast-color);
 		vertical-align: middle;
 		margin: 0;
 	}
-
 	.text-container {
 		text-align: left;
 		width: 65%;
@@ -365,74 +366,60 @@
 		transition-property: opacity;
 		line-height: 1.5em;
 	}
-
+	.bottom,
+	.logo > h1 {
+		color: var(--contrast-color);
+	}
 	.bottom {
 		margin-top: 25px;
 		width: 100%;
 		display: flex;
 		justify-content: center;
-		color: var(--contrast-color);
 		text-align: center;
 		flex-wrap: wrap;
 	}
-
-	.bottom > * {
+	.bottom > *,
+	.settings > div {
 		display: flex;
+		align-items: center;
+	}
+	.bottom > * {
 		flex: 1 1 0px;
 		flex-basis: 0;
 		height: auto;
 		margin: 0;
 		padding: 0;
 		justify-content: center;
-		align-items: center;
 	}
-
 	.settings {
 		display: flex;
 		flex-wrap: wrap;
-		padding: 0 16px 0 16px;
+		padding: 0 16px;
 	}
-
 	.settings > div {
-		display: flex;
-		align-items: center;
-		margin: 0 16px 16px 16px;
+		margin: 0 16px 16px;
 	}
-
 	.settings > div:not(:first-child) {
 		margin-left: 36px;
 	}
-
 	.settings span {
-		margin: 0 10px 0 10px;
+		margin: 0 10px;
 	}
-
 	.settings h2 {
 		font-size: 1em;
 		margin: 0;
 		cursor: pointer;
 	}
-
-	@keyframes flash {
-		from {
-			opacity: 100%;
-		}
-		to {
-			opacity: 0%;
-		}
-	}
-
 	.fade {
 		opacity: 0;
 	}
-
 	hr {
 		position: absolute;
 		height: 0.25rem;
 		width: 36px;
 		margin: 0;
 		background: var(--contrast-color);
-		border: none;
+		border: 0;
 		transition: 0.2s ease-in-out;
 		transition-property: width, top, left;
 	}
