@@ -407,7 +407,8 @@
 		margin: 0 10px 0 10px;
 	}
 
-	.settings h4 {
+	.settings h2 {
+		font-size: 1em;
 		margin: 0;
 		cursor: pointer;
 	}
@@ -472,23 +473,23 @@
 				<div class="lengths">
 					{#each lengths as length, index}
 						{#if index !== 0}<span>/</span>{/if}
-						<h4
+						<h2
 							class="length"
 							id={'length' + length.minLength}
 							on:click={() => handleLengthSelected(length)}>
 							{length.desc}
-						</h4>
+						</h2>
 					{/each}
 				</div>
 
 				<div>
-					<h4 id="words" on:click={() => handleDataSource('words')}>
+					<h2 id="words" on:click={() => handleDataSource('words')}>
 						words
-					</h4>
+					</h2>
 					<span> /</span>
-					<h4 id="quotes" on:click={() => handleDataSource('quotes')}>
+					<h2 id="quotes" on:click={() => handleDataSource('quotes')}>
 						quotes
-					</h4>
+					</h2>
 				</div>
 
 				{#if lengthIndicatorState !== undefined}
