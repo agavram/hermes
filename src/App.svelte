@@ -52,12 +52,21 @@
 
 		if (e.key !== "Delete") {
 			let currentLetter = lettersState[current].letter;
-			if (currentLetter === e.key) {
-				lettersState[current].isCorrect = true;
-			} else {
-				lettersState[current].isCorrect = false;
+			if (e.key !== " " || lettersState[current].letter === " ") {
+				if (currentLetter === e.key) {
+					lettersState[current].isCorrect = true;
+				} else {
+					if (lettersState[current].letter === " ") {
+						lettersState.splice(current, 0, {
+							letter: e.key,
+							isCorrect: false,
+							temporary: true,
+						});
+					}
+					lettersState[current].isCorrect = false;
+				}
+				current++;
 			}
-			current++;
 		}
 
 		updateWPM();
@@ -65,8 +74,6 @@
 			updateCaret();
 		} else {
 			complete = true;
-			lettersState.pop();
-			current--;
 		}
 	};
 
@@ -132,9 +139,8 @@
 
 		setTimeout(() => {
 			if (dataSource === "words") {
-				lettersState = (
-					getRandom(words.default, length.minLength).join(" ") + " "
-				)
+				lettersState = getRandom(words.default, length.minLength)
+					.join(" ")
 					.split("")
 					.map(function (letter) {
 						return {
@@ -163,7 +169,7 @@
 				handleDataSource();
 				complete = false;
 			}, 0);
-			
+
 			// ms for color of letters to change
 			setTimeout(() => {
 				fade = false;
@@ -222,18 +228,22 @@
 	}
 
 	function updateCaret() {
-		let rect = document.getElementById(current).getBoundingClientRect();
-
-		caretState = {
-			top: rect.top + "px",
-			left: rect.left - 3 + "px",
-		};
+		setTimeout(() => {
+			let rect = document.getElementById(current).getBoundingClientRect();
+			caretState = {
+				top: rect.top + "px",
+				left: rect.left - 3 + "px",
+			};
+		}, 0);
 	}
 
 	function deleteLetter() {
 		if (current - 1 >= 0) {
 			current--;
 			lettersState[current].isCorrect = undefined;
+			if (lettersState[current].temporary) {
+				lettersState.splice(current, 1);
+			}
 		}
 	}
 
