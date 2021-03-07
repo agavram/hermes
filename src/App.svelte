@@ -57,13 +57,10 @@
 					lettersState[current].isCorrect = true;
 				} else {
 					if (lettersState[current].letter === " ") {
-						lettersState.splice(current, 0, {
-							letter: e.key,
-							isCorrect: false,
-							temporary: true,
-						});
+						current--;
+					} else {
+						lettersState[current].isCorrect = false;
 					}
-					lettersState[current].isCorrect = false;
 				}
 				current++;
 			}
