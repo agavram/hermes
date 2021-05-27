@@ -132,6 +132,7 @@
 		fade = true;
 		start = undefined;
 		wpm = undefined;
+		complete = true;
 
 		setTimeout(() => {
 			if (dataSource === "words") {
