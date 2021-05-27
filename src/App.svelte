@@ -130,7 +130,6 @@
 
 	function handleRedo() {
 		fade = true;
-		current = 0;
 		start = undefined;
 		wpm = undefined;
 
@@ -165,6 +164,7 @@
 				updateLengthIndicator();
 				handleDataSource();
 				complete = false;
+				current = 0;
 			}, 0);
 
 			// ms for color of letters to change
