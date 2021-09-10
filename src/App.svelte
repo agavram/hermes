@@ -297,7 +297,7 @@
 		transition: 0.3s;
 		transition-property: background-color, color;
 		font-size: 28px;
-		font-family: "Roboto Mono", monospace;
+		font-family: 'Urbanist', sans-serif;
 	}
 	.dark {
 		--main-bg-color: #282a36;
@@ -339,6 +339,7 @@
 		margin-top: 64px;
 		flex-direction: row;
 		justify-content: center;
+		letter-spacing: 2px;
 	}
 	.logo > h1 {
 		font-style: italic;
@@ -363,6 +364,7 @@
 		transition: 0.15s ease;
 		transition-property: opacity;
 		line-height: 1.5em;
+		font-family: "PT Mono", monospace;
 	}
 	.bottom,
 	.logo > h1 {
@@ -424,10 +426,10 @@
 </style>
 
 <svelte:head>
-	<link rel="preconnect" href="https://fonts.gstatic.com" />
-	<link
-		href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital@0;1&display=swap"
-		rel="stylesheet" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Urbanist:ital@1&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
 </svelte:head>
 
 <main class={isLightTheme ? 'light' : 'dark'} id="main">
