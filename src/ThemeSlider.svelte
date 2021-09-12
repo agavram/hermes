@@ -1,16 +1,23 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
-  export let isChecked = localStorage.getItem('isLightTheme') === 'true';
-  
+  export let isChecked = localStorage.getItem("isLightTheme") === "true";
+
   function handleTheme(event) {
     isChecked = !isChecked;
-    dispatch('themeChange', {
-      isLight: isChecked
-    })
+    dispatch("themeChange", {
+      isLight: isChecked,
+    });
   }
 </script>
+
+<div class="switch">
+  <span
+    on:click={handleTheme}
+    class={isChecked ? "slider round right" : "slider round"}
+  />
+</div>
 
 <style>
   .switch {
@@ -64,7 +71,3 @@
     border-radius: 50%;
   }
 </style>
-
-<div class="switch">
-  <span on:click={handleTheme} class={isChecked ? "slider round right" : "slider round"}/>
-</div>
