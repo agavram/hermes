@@ -7,6 +7,12 @@
   import Hermes from "./assets/Hermes.svelte";
   import Redo from "./assets/Redo.svelte";
   import { onMount } from "svelte";
+  import { Chart, registerables } from "chart.js";
+	import { externalTooltipHandler } from './helpers/tooltip';
+  Chart.register(...registerables);
+  Chart.defaults.plugins.legend.display = false;
+  Chart.defaults.elements.point.radius = 0;
+  Chart.defaults.borderColor = "rgba(0, 0, 0, 0)";
 
   export let animateRedo;
   export let lettersState = [];
@@ -41,6 +47,11 @@
   let dataSource =
     localStorage.getItem("dataSource") === "quotes" ? "quotes" : "words";
 
+  let accuracy = [];
+  let correct = 0;
+  let total = 0;
+  let showChart = false;
+
   onMount(() => {
     setTimeout(() => {
       handleRedo();
@@ -56,6 +67,7 @@
       if (e.key !== " " || lettersState[current].letter === " ") {
         if (currentLetter === e.key) {
           lettersState[current].isCorrect = true;
+          correct++;
         } else {
           if (lettersState[current].letter === " ") {
             current--;
@@ -64,6 +76,8 @@
           }
         }
         current++;
+        total++;
+        accuracy.push(correct / total);
       }
     }
 
@@ -72,6 +86,7 @@
       updateCaret();
     } else {
       complete = true;
+      renderChart();
     }
   };
 
@@ -141,6 +156,9 @@
     start = undefined;
     wpm = undefined;
     complete = true;
+    correct = 0;
+    total = 0;
+    accuracy = [];
 
     setTimeout(() => {
       if (dataSource === "words") {
@@ -177,6 +195,7 @@
       // ms for color of letters to change
       setTimeout(() => {
         fade = false;
+				showChart = false;
       }, 120);
       // ms for fade out
     }, 150);
@@ -187,6 +206,82 @@
   function handleThemeChange(event) {
     isLightTheme = event.detail.isLight;
     localStorage.setItem("isLightTheme", isLightTheme);
+    if (showChart) {
+      setTimeout(() => {
+        renderChart();
+      }, 0);
+    }
+  }
+
+  let chart;
+  function renderChart() {
+    var style = getComputedStyle(document.getElementById("main"));
+    const accent = style.getPropertyValue("--accent-color");
+
+    showChart = true;
+    const dataset = accuracy.map((a) => a * 100);
+    const data = {
+      labels: dataset,
+      datasets: [
+        {
+          label: "Accuracy",
+          data: dataset,
+          fill: false,
+          borderColor: accent,
+          tension: 0.7,
+        },
+      ],
+    };
+
+    if (!chart) {
+      var ctx = document.getElementById("chart");
+      chart = new Chart(ctx, {
+        type: "line",
+        data,
+        options: {
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                maxTicksLimit: 8,
+                display: false,
+              },
+            },
+            y: {
+              grid: {
+                color: "#44475C",
+                offset: true,
+              },
+              ticks: {
+                maxTicksLimit: 12,
+                display: false,
+              },
+							max: 105,
+							min: 50,
+            },
+          },
+          animation: {
+            duration: 0,
+          },
+          interaction: {
+            mode: "index",
+            intersect: false,
+          },
+          plugins: {
+            tooltip: {
+              enabled: false,
+              position: "nearest",
+              external: externalTooltipHandler,
+            },
+          },
+        },
+      });
+    } else {
+      chart.data = data;
+      chart.update();
+    }
   }
 
   function handleLengthSelected(newLength) {
@@ -294,6 +389,9 @@
       <h1>hermes</h1>
       <Hermes />
     </div>
+    <div class="chart-container" class:fade={!showChart}>
+      <canvas id="chart" />
+    </div>
     <div class="text-container" class:fade>
       {#if !complete && caretState !== undefined}
         <span
@@ -349,6 +447,18 @@
 </main>
 
 <style>
+  .chart-container {
+    position: absolute;
+    width: 70%;
+    top: 50%;
+    height: 50%;
+    transform: translateY(-50%);
+    opacity: 1;
+    transition-property: opacity, background-color;
+    transition-duration: 0.3s;
+    z-index: 1;
+    background-color: var(--main-bg-color);
+  }
   .animate-redo {
     animation: spin 1s forwards ease;
   }
