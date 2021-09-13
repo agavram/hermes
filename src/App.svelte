@@ -228,7 +228,7 @@
           data: dataset,
           fill: false,
           borderColor: accent,
-          tension: 0.7,
+          tension: 0.5,
         },
       ],
     };
@@ -259,7 +259,7 @@
                 display: false,
               },
 							max: 105,
-							min: 50,
+							min: 0,
             },
           },
           animation: {
@@ -458,6 +458,7 @@
     transition-duration: 0.3s;
     z-index: 1;
     background-color: var(--main-bg-color);
+		max-width: 750px;
   }
   .animate-redo {
     animation: spin 1s forwards ease;
