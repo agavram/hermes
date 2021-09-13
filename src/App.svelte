@@ -176,7 +176,7 @@
         do {
           quote = getRandom(quotes.default, 1)[0];
         } while (Math.abs(quote.length / 5 - length.minLength) > 10);
-        lettersState = (quote.content + " ").split("").map(function (letter) {
+        lettersState = quote.content.split("").map(function (letter) {
           return {
             letter: letter,
             isCorrect: undefined,
