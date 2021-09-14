@@ -27,4 +27,12 @@
     padding: 10px;
     transform: rotate(0deg);
   }
+
+  @media only screen and (max-width: 490px) {
+    svg {
+      height: 24px;
+      width: 24px;
+      padding: 5px;
+    }
+  }
 </style>

@@ -26,6 +26,7 @@
     height: 34px;
     top: 16px;
     right: 16px;
+    min-width: 16px;
   }
 
   .slider {

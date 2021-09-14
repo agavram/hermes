@@ -22,4 +22,10 @@
     margin: 12px;
     width: 100px;
   }
+  @media only screen and (max-width: 490px) {
+    svg {
+      width: 50px;
+      height: 50px;
+    }
+  }
 </style>
