@@ -392,12 +392,13 @@
   }
   .chart-container {
     position: absolute;
-    bottom: 45%;
+    top: 25%;
+    transform: translateY(-25%);
     width: 90%;
     max-width: 750px;
     opacity: 1;
-    transition-property: opacity, background-color;
-    transition-duration: 0.3s;
+    transition-property: opacity,background-color;
+    transition-duration: 300ms;
     z-index: 1;
     background-color: var(--main-bg-color);
   }
