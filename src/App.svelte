@@ -332,7 +332,7 @@
     {/if}
     <div />
     <div id="text-container" class="text-container" class:fade={showChart || fade}>
-      <textarea id="textarea" cols="10" rows="10" on:input={textChanged} ondrop="return false;" onpaste="return false;" />
+      <textarea id="textarea" cols="10" rows="10" on:input={textChanged} ondrop="return false;" onpaste="return false;" autocapitalize="none" autocomplete="off"/>
       {#if !focusLost && !complete && caretState !== undefined}
         <span class="caret" style={`top: ${caretState.top}; left: ${caretState.left}`} />
       {/if}
