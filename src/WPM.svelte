@@ -9,5 +9,6 @@
     white-space: nowrap;
     padding: 0 12px 0 12px;
     font-size: 1em;
+    width: 110px;
   }
 </style>
