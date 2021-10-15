@@ -203,6 +203,7 @@
       setTimeout(() => {
         updateLengthIndicator()
         handleDataSource()
+        ta.focus();
         complete = false
       }, 0)
 
